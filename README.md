@@ -1,6 +1,9 @@
-# Getting Started with the iTwin Viewer Create React App Template
+# ProjectWise Properties
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The application will display the ProjectWise Properties that were published into the iModel when the element was last updated.
+Note to see previous versions you can use ChangeSetId in the url
+The Application uses JSONViewer to display the JSON object and properties which include the connector details as well as the Document Attributes.
 
 ## Environment Variables
 
@@ -20,7 +23,6 @@ IMJS_AUTH_CLIENT_SCOPES =""
 
   - **Visualization**: `imodelaccess:read`
   - **iModels**: `imodels:read`
-  - **Reality Data**: `realitydata:read`
 
 - The application will use the path of the redirect URI to handle the redirection, it must simply match what is defined in your client.
 
