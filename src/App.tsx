@@ -100,7 +100,7 @@ const App: React.FC = () => {
     if (accessToken && iTwinId && iModelId) {
       history.push(`?iTwinId=${iTwinId}&iModelId=${iModelId}&ChangeSetId=${changeSetId}`);
     }
-  }, [accessToken, iTwinId, iModelId]);
+  }, [accessToken, iTwinId, iModelId, changeSetId]);
 
   /** NOTE: This function will execute the "Fit View" tool after the iModel is loaded into the Viewer.
    * This will provide an "optimal" view of the model. However, it will override any default views that are

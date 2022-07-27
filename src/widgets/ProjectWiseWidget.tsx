@@ -6,18 +6,14 @@ import React, { useEffect, useRef, useState } from "react";
 import { AbstractWidgetProps, StagePanelLocation, StagePanelSection, UiItemsProvider, WidgetState } from "@itwin/appui-abstract";
 import { Alert } from "@itwin/itwinui-react";
 import { KeySet } from "@itwin/presentation-common";
-import { consoleDiagnosticsHandler, Presentation, SelectionChangeEventArgs } from "@itwin/presentation-frontend";
+import { Presentation, SelectionChangeEventArgs } from "@itwin/presentation-frontend";
 
-import "../css/RealityData.scss";
+import "../css/Widget.scss";
 import { useActiveIModelConnection, useActiveViewport } from "@itwin/appui-react";
 import { IModelConnection } from "@itwin/core-frontend";
 import { JSONTree } from "react-json-tree";
-import { ErrorObserver } from "@itwin/components-react";
 
-interface SelectedElement extends Record<string, string> {
-  elementId: string;
-  className: string;
-}
+
 const theme = {
   scheme: 'monokai',
   author: 'wimer hazenberg (http://www.monokai.nl)',
@@ -55,7 +51,7 @@ const ProjectWiseWidget = () => {
   const [initialized, setInitialized] = React.useState<boolean>(false);
   const [pwAttributes, setPWAttributes] = useState({});
   const selectedElements = useRef<KeySet>(new KeySet());
-  const [elementsAreSelected, setElementsAreSelected] = useState<boolean>(false);
+  // const [elementsAreSelected, setElementsAreSelected] = useState<boolean>(false);
 
 
   // Initialize the widget
@@ -75,34 +71,35 @@ const ProjectWiseWidget = () => {
     // Change the default selection scope. Top-assembly scope returns key of selected element's topmost parent element (or just the element if it has no parents)
     Presentation.selection.scopes.activeScope = "top-assembly";
     Presentation.selection.selectionChange.addListener(_onSelectionChanged);
-  }, []);
+  },);
 
 
   const _onSelectionChanged = async (event: SelectionChangeEventArgs) => {
     let elements: string[] = [];
     selectedElements.current = new KeySet(event.keys);
-    setElementsAreSelected(!event.keys.isEmpty);
+    // setElementsAreSelected(!event.keys.isEmpty);
     selectedElements.current.instanceKeys.forEach((values, key) => {      
       elements = Array.from(values)
 
     });
     //console.log(elements);
-    const props = await getPWProps(elements[0]);
+    await getPWProps(elements[0]);
     //console.log(props);
 
   };
 
   const getPWProps = async (ecInstanceId : string) => {
+    let pwReturn = ""
     if (!iModelConnection) {
-      return ""
+      return pwReturn
     }
     const sql = "select esa.element.id as Id, rl.jsonproperties as pwproperties from bis.Externalsourceaspect esa join bis.externalsource es on esa.source.id = es.ecinstanceid join bis.repositorylink rl on rl.ecinstanceid = es.repository.id where esa.element.id = " + ecInstanceId
-    let pwReturn = ""
+    
     try {
       const properties = await _executeQuery(iModelConnection, sql)
-      for (const prop of properties.values()) {
+      for (const property of properties.values()) {
         //console.log(prop);
-        const pwattributes = JSON.parse(prop[1]);
+        const pwattributes = JSON.parse(property[1]);
         console.log(pwattributes);
         pwReturn =  pwattributes
         setPWAttributes(pwReturn)
@@ -116,23 +113,6 @@ const ProjectWiseWidget = () => {
     }
 
   }
-
-  const showProps = async () => {
-    const iModel = viewport?.iModel
-    let elements: SelectedElement[] = [];
-
-    selectedElements.current.instanceKeys.forEach((values, key) => {
-      const classElements = Array.from(values)
-        .filter((value) => undefined)
-        .map((value) => ({ elementId: value, className: key }));
-      elements = elements.concat(classElements);
-    });
-    console.log(elements[0])
-    const pwProps = await getPWProps(elements[0].elementId)
-    
-
-  }
-
 
 
   // When the button is toggled, display the realityModel and set its transparency to where the slider is currently set.
