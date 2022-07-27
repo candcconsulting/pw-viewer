@@ -98,7 +98,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (accessToken && iTwinId && iModelId) {
-      history.push(`?iTwinId=${iTwinId}&iModelId=${iModelId}`);
+      history.push(`?iTwinId=${iTwinId}&iModelId=${iModelId}&ChangeSetId=${changeSetId}`);
     }
   }, [accessToken, iTwinId, iModelId]);
 

@@ -12,6 +12,7 @@ import "../css/RealityData.scss";
 import { useActiveIModelConnection, useActiveViewport } from "@itwin/appui-react";
 import { IModelConnection } from "@itwin/core-frontend";
 import { JSONTree } from "react-json-tree";
+import { ErrorObserver } from "@itwin/components-react";
 
 interface SelectedElement extends Record<string, string> {
   elementId: string;
@@ -96,16 +97,23 @@ const ProjectWiseWidget = () => {
       return ""
     }
     const sql = "select esa.element.id as Id, rl.jsonproperties as pwproperties from bis.Externalsourceaspect esa join bis.externalsource es on esa.source.id = es.ecinstanceid join bis.repositorylink rl on rl.ecinstanceid = es.repository.id where esa.element.id = " + ecInstanceId
-    const properties = await _executeQuery(iModelConnection, sql)
     let pwReturn = ""
-    for (const prop of properties.values()) {
-      //console.log(prop);
-      const pwattributes = JSON.parse(prop[1]);
-      console.log(pwattributes);
-      pwReturn =  pwattributes
-      setPWAttributes(pwReturn)
+    try {
+      const properties = await _executeQuery(iModelConnection, sql)
+      for (const prop of properties.values()) {
+        //console.log(prop);
+        const pwattributes = JSON.parse(prop[1]);
+        console.log(pwattributes);
+        pwReturn =  pwattributes
+        setPWAttributes(pwReturn)
+      }
+      return pwReturn
     }
-    return pwReturn    
+    catch (e) {
+      const err = e as Error
+      console.log(`Caught Error : ${err.message}`)
+      return pwReturn
+    }
 
   }
 
